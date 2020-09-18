@@ -23,12 +23,15 @@ func main() {
 	authGroup.Use(auth)
 
 	authGroup.PUT("api/user", user.Put)
-	authGroup.POST("api/user", user.Post)
+
 	// authGroup.DELETE("api/user", user.Delete)
 	//不需要权限验证的
 	noAuthGroup := r.Group("/v1")
 
+	//登录
 	noAuthGroup.GET("api/user", user.Get)
+	//注册
+	authGroup.POST("api/user", user.Post)
 	//例子
 	noAuthGroup.POST("api/example", example.Upload)
 	noAuthGroup.POST("api/example/redis", example.Redis)

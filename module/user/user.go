@@ -20,27 +20,40 @@ var db = D.DBT("user")
 //table 收藏表
 const table = "user"
 
-//Get 查询接口
+//Get 登录
 func Get(c *gin.Context) {
-	users, err := db.Fields("id,mobile,nickname,token,expired_at").Get()
+	mobile := c.PostForm("mobile")
+	password := c.PostForm("password")
+	message, ok := valid.CheckList([]V.Rule{
+		V.Rule{Name: "手机号码", Input: mobile, Rule: []string{"require", "numeric", "mobile"}},
+		V.Rule{Name: "密码", Input: password, Rule: []string{"require", "minsize:6"}},
+	})
+	if !ok {
+		c.JSON(response.HTTPStatusFaild, G.Json(message, nil))
+		return
+	}
+	user, err := db.Where("mobile", mobile).Where("password", T.MD5(password)).Fields("token,expired_at").First()
 	if err != nil {
 		c.JSON(response.HTTPStatusFaild, err.Error())
 		return
 	}
-
-	c.JSON(response.HTTPStatusOK, G.Json("获取数据成功", users))
+	if len(user) < 1 {
+		c.JSON(response.HTTPStatusOK, G.Json("手机号码或密码不正确", nil))
+		return
+	}
+	c.JSON(response.HTTPStatusOK, G.Json("获取数据成功", user))
 }
 
-//Post 新增接口/重复则更新
+//Post 注册
 func Post(c *gin.Context) {
 	mobile := c.PostForm("mobile")
 	name := c.PostForm("name")
-	ttype := c.PostForm("type")
+	password := c.PostForm("password")
 	price := c.PostForm("price")
 	message, ok := valid.CheckList([]V.Rule{
 		V.Rule{Name: "手机号码", Input: mobile, Rule: []string{"require", "numeric", "mobile"}},
 		V.Rule{Name: "用户名", Input: name, Rule: []string{"require"}},
-		V.Rule{Name: "商品类型", Input: ttype, Rule: []string{"require"}},
+		V.Rule{Name: "密码", Input: password, Rule: []string{"require", "minsize:6"}},
 		V.Rule{Name: "商品价格", Input: price, Rule: []string{"require", "float"}},
 	})
 	if !ok {
@@ -50,7 +63,7 @@ func Post(c *gin.Context) {
 	//增加
 	t, _ := time.ParseDuration("1h")
 	expire := time.Now().Add(t).Unix()
-	res, err := db.Data(G.MakeData{"mobile": mobile, "nickname": name, "token": T.MD5(time.Now()), "expired_at": expire}).Insert()
+	res, err := db.Data(G.MakeData{"mobile": mobile, "nickname": name, "password": T.MD5(password), "token": T.MD5(time.Now()), "expired_at": expire}).Insert()
 	if err != nil {
 		c.JSON(response.HTTPStatusFaild, G.Json(err.Error(), nil))
 	}
