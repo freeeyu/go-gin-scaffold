@@ -12,6 +12,7 @@ require (
 	github.com/gohouse/golib v0.0.0-20200803075441-e803aac18ccb // indirect
 	github.com/gohouse/gorose/v2 v2.1.9
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a // indirect

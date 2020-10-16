@@ -4,7 +4,8 @@ import (
 	"github.com/Unknwon/goconfig"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
-	"log"
+	log "go_api/lib/logger"
+	"os"
 	"strconv"
 )
 
@@ -28,7 +29,8 @@ func initConfig() {
 	var err error
 	conf, err = goconfig.LoadConfigFile("config.ini")
 	if err != nil {
-		log.Println(err.Error())
+		log.Ins.Logger().WithField("error", err.Error()).Fatalln("配置文件不存在,请将config.ini放入程序执行目录下。")
+		os.Exit(0)
 	}
 }
 
@@ -39,7 +41,8 @@ func Config(section string, key string) string {
 	}
 	sec, err := conf.GetSection(section)
 	if err != nil {
-		log.Panicln(err.Error())
+		log.Ins.Logger().WithField("error", err.Error()).Fatalln("配置文件读取错误。")
+		os.Exit(0)
 	}
 	return sec[key]
 }
