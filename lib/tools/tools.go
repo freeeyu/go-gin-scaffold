@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 )
 
 //MD5 md5加密,支持字符串,整数
